@@ -13,13 +13,13 @@ function getListOfStock()
 		exit;
 	}
 
-	$sql='select * from stock';
+	$sql='select * from product';
 	$qry=mysqli_query($con,$sql);
 	return $qry;
 	
 }	
 
-function searchById($id)
+function searchById($ID)
  {
 	$con=mysqli_connect("localhost","root","root","expired_date");
 	if(!$con)
@@ -28,12 +28,43 @@ function searchById($id)
 		exit;
 	}
 
-	$sql="select * from stock where id =".$id."";
-	echo $sql;
+	$sql="select * from product where ID =".$ID."";
+	//echo $sql;
 	$qry=mysqli_query($con,$sql);
 	return $qry;
 } 
 	
+function ASC(){
+	
+	$con=mysqli_connect("localhost","root","root","expired_date");
+	if(!$con)
+	{
+		echo mysqli_connect_error();
+		exit;
+	}
+	//echo 'connected';
+	
+	$sql='SELECT * FROM product ORDER BY ID ASC ';
+	$qry=mysqli_query($con,$sql);
+	return $qry;
+	
+}
+
+function DESC(){
+	
+	$con=mysqli_connect("localhost","root","root","expired_date");
+	if(!$con)
+	{
+		echo mysqli_connect_error();
+		exit;
+	}
+	//echo 'connected';
+	
+	$sql='SELECT * FROM product ORDER BY ID DESC ';
+	$qry=mysqli_query($con,$sql);
+	return $qry;
+	
+}
 	
 	
 ?>
