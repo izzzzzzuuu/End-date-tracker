@@ -19,8 +19,10 @@ else if(isSet($_POST['addProductButton']))
 	header( "refresh:1; url=itemList.php" );
 	}
 //--------------------------------------------------------------------
-
+else if(isSet($_POST['locateButton']))   //8/9
+	{
+	locateItem($_POST['locateLane']);
+	header( "refresh:1; url=location.php" );
+	}
 	
 ?>
-
-
