@@ -46,13 +46,13 @@ while($row=mysqli_fetch_assoc($stockList))//Display product information
   {
   echo "<tr>";
   echo "<td>".$count."</td>";
-  echo "<td>" . $row['id'] . "</td>";
+  echo "<td>" . $row['ID'] . "</td>";
   echo "<td>" . $row['barcode']. "</td>";
   echo "<td>" . $row['item']. "</td>";
   $date=date_create($row['currentdate']);
-  $currentdate = date_format($date,"d/m/Y"); 	
+  $currentdate = date_format($date,"Y/m/d"); 	
   echo "<td>" . $row['currentdate']. "</td>";
-  echo "<td>" . $row['currentstock']. "</td>";
+  echo "<td>" . $row['stock']. "</td>";
   echo "<td>" . $row['brand']. "</td>";
   
 
