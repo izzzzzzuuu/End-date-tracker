@@ -1,7 +1,22 @@
 <head>
 <title>main menu</title>
+<link rel="icon" href="storeicon.png"> 
 </head>
 <body>
+<div class="bg-img">
+<div class="centered">Welcome to your inventory</div>
+  <div class="container">
+    <div class="topnav">
+      <a href="itemList.php">Home</a>
+      <a href="AddProductForm.php">Add</a>
+      <a href="stockList.php">Stock</a>
+	  <a href="report.php">Report</a>
+    
+    </div>
+  </div>
+</div>
+
+
 <?php
 include "product.php";
 
@@ -12,6 +27,9 @@ if (isSet($_POST['searchByBarcode']))						//query for searching by barcode
 	
 else if(isSet($_POST['searchByItems']))						//query for searching by Item
 	$itemQry = searchByItems($_POST['searchValue']);
+	
+else if(isSet($_POST['searchByStatus']))						//query for searching by Item
+	$itemQry = searchByStatus($_POST['searchValue']);
 	
 else if(isSet($_POST['searchByBrand']))						//query for searching by brand
 	$itemQry = searchByBrand($_POST['searchValue']);
@@ -33,21 +51,26 @@ displaySearchPanel();
 
 $noOfItem = mysqli_num_rows($itemQry);						//query for calculate no of items in database
 
-echo '<br>There are  '.$noOfItem.' items records';			//Display number of items in database
+echo '<p2><br>There are  '.$noOfItem.' items records</p2>';			//Display number of items in database
 
-echo '<table border=1 cellspacing=0 cellpadding=10 border=1 style="width:100%;" class="w3-table w3-bordered w3-striped w3-large w3-hoverable w3-card-4">';
-	echo '<tr class="w3-light-blue">';
+
+echo '<table id="customers">';
+	echo '<tr >';
 	echo '<tr>
 			<th>Bil</th>
 			<th>Product barcode</th>
 			<th>Items</th>
+			<th>Price</th>
 			<th>Brand</th>
 			<th>Category</th>
 			<th>Lane</th>
 			<th>Mode</th>
 			<th>Shelf</th>
 			<th>Expired Date</th>
+		
+			<th>Status</th> 
 			<th>Stock</th>
+			<th>Location</th>
 			<th>Delete</th>
 			<th>Update</th>
 		
@@ -56,26 +79,62 @@ echo '<table border=1 cellspacing=0 cellpadding=10 border=1 style="width:100%;" 
 $bil=1;
 while($row=mysqli_fetch_assoc($itemQry))						//loop for inserting data into table from database in phpmyAdmin
 	{
+		/*=================================================
+		$dateToCheck=$row['expiredDate'];
+		$today=date();
+		echo  $dateToCheck.'-==='.date('Y-m-d'); 
+		====================================================*/
+		
 		echo '<tr class=" w3-hover-text-blue"align=center>';
 		echo '<tr>';
 		echo '<td>'.$bil.'</td>';
 		echo '<br><td>'.$row['product_barcode'].'</td>';		//fetch data product_barcode from database
+
 		echo '  <td>'.$row['items'].'</td>';					//fetch data items from database
+		echo '  <td>'.$row['price'].'</td>';
 		echo '  <td>'.$row['brand'].'</td>';					//fetch data brand from database
 		echo '  <td>'.$row['category'].'</td>';
 		echo '  <td>'.$row['lane'].'</td>';
 		echo '  <td>'.$row['mode'].'</td>';
 		echo '  <td>'.$row['shelf'].'</td>';
-		echo '  <td>'.$row['expiredDate'].'</td>';				//fetch data expiredDate from database
+		//--------------------------------------------------------------------------------------------//fetch data expiredDate from database
+		if($row['expiredDate']== date('Y-m-d'))
+		{
+				echo '  <td>'.$row['expiredDate'].'  <p3><b>Today</b></p3></td>';
+		}
+		elseif($row['expiredDate'] < date('Y-m-d'))
+				echo '  <td>'.$row['expiredDate'].' <p1><b>Overdue</b></p1></td>';
+		else
+				echo '  <td>'.$row['expiredDate'].'</td>';
+		//--------------------------------------------------------------------------------------------------------------------
+		/* if($row['NumOfExpiredDays']== date('Y-m-d'))
+		{
+				echo '  <td>'.$row['NumOfExpiredDays'].'  <b>Today</b></td>';
+		}
+		else
+				echo '  <td>'.$row['NumOfExpiredDays'].'---</td>'; */
+		//====================================================================================================================
+	
+		echo '  <td>'.$row['status'].'</td>';
 		echo '  <td>'.$row['stock'].'</td>';
 
 		//------------------------------------------------
 		//DELETE product 
 		$barcode=$row['product_barcode'];
+		$location=$row['lane'];  //8/9/18
+		$locatioN=$row['mode'];  //29/9/18
+		echo'<td>';
+			echo '<form action ="location.php" method = "post">';
+			echo "<input type='hidden' name='locateLane' value='$location'>";
+			echo "<input type='hidden' name='locateMode' value='$locatioN'>";
+			echo "<button class='btn' name='locateButton' value='Locate'>";
+			echo '</form>';
+		echo'</td>';
+		//=============================================================
 		echo'<td>';
 			echo '<form action ="processProduct.php" method = "post">';
 			echo "<input type='hidden' name='barcodeToDelete' value='$barcode'>";
-			echo "<input type='submit' name='deleteButton' value='delete'>";
+			echo "<button class='btn' name='deleteButton' value='delete'><i class='fa fa-trash'></i></button>";
 			echo '</form>';
 		echo'</td>';
 		//------------------------------------------------
@@ -83,11 +142,11 @@ while($row=mysqli_fetch_assoc($itemQry))						//loop for inserting data into tab
 		echo'<td>';
 			echo '<form action ="updateItemForm.php" method = "post">';
 			echo "<input type='hidden' name='barcodeToUpdate' value='$barcode'>";
-			echo "<input type='submit' name='updateButton' value='Update'>";
+			echo "<button class='btn' name='updateButton' value='Update'><i class='fa fa-upload'></i></button>";
 			echo '</form>';
 		echo'</td>';
 		//-------------------------------------------------
-		//Ascending button
+
 
 		//-------------------------------------------------
 		echo '</tr>';
@@ -95,14 +154,14 @@ while($row=mysqli_fetch_assoc($itemQry))						//loop for inserting data into tab
 		$bil++;
 	}
 
-//-----------------------------------------------
+/* //-----------------------------------------------
 	echo '<form action ="AddProductForm.php" method="post">';
 	echo '<br><input type="Submit" name="addProductButton" value="Add Product">';
 	echo '</form>';
 	
 	echo '<form action ="stockList.php" method="post">';
 	echo '<br><input type="Submit" value="View Stock">';
-	echo '</form>';
+	echo '</form>'; */
 echo '</table>';
 ?>
 
@@ -110,8 +169,6 @@ echo '</table>';
 function displaySearchPanel()										//Function for search box
 {
 
-    echo'<p1> welcome to your inventory</p1>';						//Header 
-	
 	echo '<form action="itemList.php" method="post">';
 	
 	echo '<fieldset><legend><br><br><p2>Search Item:</p2></legend>';		//legend
@@ -123,6 +180,7 @@ function displaySearchPanel()										//Function for search box
 	echo '<input type="submit" name="searchByBrand" value="By Brand" id="button3">';				//search by brand button
 	echo '<input type="submit" name="searchByCategory" value="By Category">';
 	echo '<input type="submit" name="searchByDate" value="By Expired Date"><br>';						//search by date button
+	echo '<br><input type="submit" name="searchByStatus" value="By Status">';
 	
 	echo '<br> <input type="submit" name="ASC" value="Ascending"><br>';
     echo ' <input type="submit" name="DESC" value="Descending"><br><br>';
@@ -138,160 +196,218 @@ function displaySearchPanel()										//Function for search box
 
 ?>
 </body>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <style>
+p1{
+	 color: red;
+ }
+
+ p3{
+	 color: Blue;
+ }
    
-   
-   body { 
-    background:lightblue; 
-   }
-   table {
-  overflow: hidden;
+  p2 {
+	font-family: Courier New;
+	background: #F3F3F3;
+}
+   #customers {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
 }
 
-td, th {
-  
-  
-  padding: 10px;
-  position: relative;
-  outline: 0;
+#customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
 }
 
-body:not(.nohover) tbody tr:hover {
-  background-color: #ffa;
-}
+#customers tr:nth-child(even){background-color: #f2f2f2;}
 
-td:hover::after,
-thead th:not(:empty):hover::after,
-td:focus::after,
-thead th:not(:empty):focus::after { 
-  content: '';  
-  height: 10000px;
-  left: 0;
-  position: absolute;  
-  top: -5000px;
-  width: 100%;
-  z-index: -1;
-}
+#customers tr:hover {background-color: #ddd;}
 
-td:hover::after,
-th:hover::after {
-  background-color: #ffa;
-}
-
-td:focus::after,
-th:focus::after {
-  background-color: lightblue;
-}
-
-/* Focus stuff for mobile */
-td:focus::before,
-tbody th:focus::before {
-  background-color: lightblue;
-  content: '';  
-  height: 100%;
-  top: 0;
-  left: -5000px;
-  position: absolute;  
-  width: 10000px;
-  z-index: -1;
-}
-
-	p1{
-	color: #444444;
-    background: #F3F3F3;
-    border: 1px #DADADA solid;
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 40pt;
-	text-align:center;
-	}
-    
-	
-	fieldset {
-	font: 1em Verdana, Geneva, sans-serif;
-	text-transform: none;
-	color: #00F;
-	background: white;
-	border: thick solid #333;
-	}
-	
-	#legend {
-	font-size: 1.4em;
-	text-transform: uppercase;
-	color: #000;
-	}
-	
-	button:hover {
-    border: 1px #C6C6C6 solid;
-    box-shadow: 1px 1px 1px #EAEAEA;
-    color: #333333;
-    background: #F7F7F7;
-	}
-
-	button:active {
-    box-shadow: inset 1px 1px 1px #DFDFDF;   
-	}
-
-	#button1 {
-	color: white;
-    background: #4C8FFB;
-    border: 1px #3079ED solid;
-    box-shadow: inset 0 1px 0 #80B0FB;
-	}
-    #button1:hover {
-    border: 1px #2F5BB7 solid;
-    box-shadow: 0 1px 1px #EAEAEA, inset 0 1px 0 #5A94F1;
-    background: #3F83F1;
-	}
-
-    #button1:active {
-    box-shadow: inset 0 2px 5px #2370FE;   
-	}
-   
-	#button2 {
-	color: white;
-    border: 1px solid #FB8F3D; 
-    background: -webkit-linear-gradient(top, #FDA251, #FB8F3D);
-    background: -moz-linear-gradient(top, #FDA251, #FB8F3D);
-    background: -ms-linear-gradient(top, #FDA251, #FB8F3D);
-	}
-	
-	#button2:hover {
-    border: 1px solid #EB5200;
-    background: -webkit-linear-gradient(top, #FD924C, #F9760B); 
-    background: -moz-linear-gradient(top, #FD924C, #F9760B); 
-    background: -ms-linear-gradient(top, #FD924C, #F9760B); 
-    box-shadow: 0 1px #EFEFEF;
-	}
-
-	#button2:active {
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
-	}
-
-	#button3 {
-	background: -webkit-linear-gradient(top, #DD4B39, #D14836); 
-    background: -moz-linear-gradient(top, #DD4B39, #D14836); 
-    background: -ms-linear-gradient(top, #DD4B39, #D14836); 
-    border: 1px solid #DD4B39;
+#customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #40c4ff;
     color: white;
-    text-shadow: 0 1px 0 #C04131;
-	}
+}
 	
-    #button3:hover {
-    background: -webkit-linear-gradient(top, #DD4B39, #C53727);
-    background: -moz-linear-gradient(top, #DD4B39, #C53727);
-    background: -ms-linear-gradient(top, #DD4B39, #C53727);
-    border: 1px solid #AF301F;
-	}
+input[type=submit]{
+    background-color: #e8f5e9; /* Green */
+    border: none;
+    color: black;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+input[type=submit]:hover {
+	background-color: #98F9A7;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.btn {
+    background-color: #e53935;
+    border: none;
+    color: white;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-    #button3:active {
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
-    background: -webkit-linear-gradient(top, #D74736, #AD2719);
-    background: -moz-linear-gradient(top, #D74736, #AD2719);
-    background: -ms-linear-gradient(top, #D74736, #AD2719);
-	}
-	 
+/* Darker background on mouse-over */
+.btn:hover {
+    background-color: RoyalBlue;
+}
+* {box-sizing: border-box}
+body {font-family: "Lato", sans-serif;}
+
+/* Style the tab */
+.tab {
+    float: left;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 30%;
+    height: 300px;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 22px 16px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    float: left;
+    padding: 0px 12px;
+    border: 1px solid #ccc;
+    width: 70%;
+    border-left: none;
+    height: 300px;
+}
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+.bg-img {
+  /* The image used */
+  background-image: url("anime.jpg");
+
+  min-height: 380px;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  
+  /* Needed to position the navbar */
+  position: relative;
+  
+}
+
+/* Position the navbar container inside the image */
+.container {
+  position: absolute;
+  margin: 20px;
+  width: auto;
+}
+
+/* The navbar */
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+/* Navbar links */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+input[type=text] {
+    width: 130px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-image: url('searchicon.png');
+    background-position: 1px 1px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+    width: 100%;
+}
+input[type=date] {
+    width: 130px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-image: url('searchicon.png');
+    background-position: 10px 10px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=date]:focus {
+    width: 100%;
+}
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+	background: #F3F3F3;
+	text-transform: uppercase;
+    color: #212121;
+	font-family:Courier New ;
+	font-size: 270%;
+}	 
+body  {
+    background-image: url("storewall.jpg");
+   
+}
 </style>
