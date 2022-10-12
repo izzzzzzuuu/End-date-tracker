@@ -6,23 +6,23 @@
 <!-- Add icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-<style>
 	body {font-family: Arial, Helvetica, sans-serif;}
 * {box-sizing: border-box;}
 
     p1 
 	{
 		
-		color:black;
-		font-size : 38px;
-		margin : 461px;
+		color:#cfd8dc;
+		font-size : 320%;
+		margin : 330px;
 		text-align: center;
-	
+		text-transform: uppercase;
+		font-family: Lucida Console;
 	}
 
 	
 	input[type=submit] {
-      background-color: dodgerblue;
+      background-color: #90a4ae;
     color: white;
     padding: 15px 20px;
     border: none;
@@ -44,7 +44,7 @@
 }
 .icon {
     padding: 10px;
-    background: dodgerblue;
+    background: #90a4ae;
     color: white;
     min-width: 50px;
     text-align: center;
@@ -58,7 +58,12 @@
 .input-field:focus {
     border: 2px solid dodgerblue;
 }
-
+body {
+    background-image: url("kiki.jpg");
+	
+    background-size: auto;
+}
+}
 </style>
 </head>
 <body>
