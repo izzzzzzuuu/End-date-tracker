@@ -39,12 +39,15 @@ function addProductRecord()
 {
 	
 $product_barcode= $_POST['product_barcode'];
+$ID= $_POST['ID'];
 $items= $_POST['items'];
+$price= $_POST['price'];
 $brand= $_POST['brand'];
 $category= $_POST['category'];
 $lane= $_POST['lane'];
 $mode= $_POST['mode'];
 $shelf= $_POST['shelf'];
+$stock_In = $_POST['stock_In'];
 $expiredDate= $_POST['expiredDate'];
 $stock= $_POST['stock'];
 $con = mysqli_connect('localhost','root','root','expired_date');
@@ -55,8 +58,8 @@ if(!$con)
 else
 	{
 	echo 'connected';
-	$sql = "insert into product(product_barcode,items,brand,category,lane,mode,shelf,expiredDate,stock)
-	values('$product_barcode','$items','$brand','$category','$lane','$mode','$shelf','$expiredDate','$stock')";
+	$sql = "insert into product(product_barcode,items,price,ID,brand,category,lane,mode,shelf,stock_In,expiredDate,stock)
+	values('$product_barcode','$items','$price','$ID','$brand','$category','$lane','$mode','$shelf','$stock_In','$expiredDate','$stock')";
 	//$sql = "INSERT INTO product(product_barcode, items, brand, category, ) VALUES('value1',value2,value3); INSERT INTO STOCK(field) VALUES ('value1');";
 
 	echo $sql;
@@ -84,6 +87,25 @@ function deleteThisItem($product_barcode)
 	$qry=mysqli_query($con,$sql);
 	return $qry;
 }
+
+//============================9/8/18
+function locateItem($lane, $mode)
+{
+	$con=mysqli_connect("localhost","root","root","expired_date");
+	if(!$con)
+	{
+		echo mysqli_connect_error();
+		exit;
+	}
+	//echo 'connected';
+	$sql="select * from product where lane ='".$lane."' AND mode ='".$mode."'";
+	/* $sql="select from product where lane ='".$lane."' && mode ='".$mode."'"; */
+	
+	//echo $sql;
+	$qry=mysqli_query($con,$sql);
+	return $qry;
+}
+//============================
 
 function searchByBarcode($product_barcode)
 {
@@ -133,6 +155,22 @@ function searchByCategory($category)
 	return $qry;
 }
 
+function searchByStatus($status)
+{
+	$con=mysqli_connect("localhost","root","root","expired_date");
+	if(!$con)
+	{
+		echo mysqli_connect_error();
+		exit;
+	}
+	//echo 'connected';
+	
+	$sql="select * from product where status ='".$status."'";
+	//echo $sql;
+	$qry=mysqli_query($con,$sql);
+	return $qry;
+}
+
 function searchByBrand($brand)
 {
 	$con=mysqli_connect("localhost","root","root","expired_date");
@@ -175,56 +213,26 @@ if(!$con)
 //get the data to update
  $oldproduct_barcode = $_POST['product_barcode'];
  $newproduct_barcode = $_POST['newproduct_barcode'];
+ $ID = $_POST['ID']; //ID
  $items = $_POST['items']; //items
+ $price = $_POST['price'];
  $brand = $_POST['brand'];
  $category= $_POST['category'];
-$lane= $_POST['lane'];
-$mode= $_POST['mode'];
-$shelf= $_POST['shelf'];
+ $lane= $_POST['lane'];
+ $mode= $_POST['mode'];
+ $shelf= $_POST['shelf'];
+ $stock_In = $_POST['stock_In'];
  $expiredDate = $_POST['expiredDate'];
+ $status= $_POST['status'];
  $stock = $_POST['stock'];
- $sql = 'UPDATE product SET product_barcode ="'.$newproduct_barcode.'", items = "'.$items.'", brand = "'.$brand.'", category = "'.$category.'",lane = "'.$lane.'", mode = "'.$mode.'", shelf = "'.$shelf.'", expiredDate = "'.$expiredDate.'", stock = "'.$stock.
+ $sql = 'UPDATE product SET product_barcode ="'.$newproduct_barcode.'",ID = "'.$ID.'", items = "'.$items.'", price = "'.$price.'", brand = "'.$brand.'", category = "'.$category.'",lane = "'.$lane.'", mode = "'.$mode.'", shelf = "'.$shelf.'", stock_In = "'.$stock_In.'", expiredDate = "'.$expiredDate.'", status = "'.$status.'", stock = "'.$stock.
 '" WHERE product_barcode = "'.$oldproduct_barcode.'"';
 //echo $sql;
 $qry = mysqli_query($con,$sql);//run query
 return $qry;  //return query
 }
-
-/* function searchBox()
-{
-	
-	$con=mysqli_connect("localhost","root","root","expired_date");
-	if(!$con)
-	{
-		echo mysqli_connect_error();
-		exit;
-	}
-	//echo 'connected';
-	
-	$sql='select * FROM product';
-	//echo $sql;
-	$qry=mysqli_query($con,$sql);
-	return $qry;
-}
-//-----------------------------------------------------------------------
-	if (isSet($_POST['searchByBarcode']))						//query for searching by barcode
-		$itemQry = searchByBarcode($_POST['searchValue']);
-	
-	else if(isSet($_POST['searchByItems']))						//query for searching by Item
-		$itemQry = searchByItems($_POST['searchValue']);
-	
-	else if(isSet($_POST['searchByBrand']))						//query for searching by brand
-		$itemQry = searchByBrand($_POST['searchValue']);
-	
-	else if(isSet($_POST['searchByDate']))						//query for searching by Date
-		$itemQry = searchByDate($_POST['searchValue2']);
-	
-	else
-		$itemQry=getListOfItem();								//query for searching by Display all function
-//---------------------------------------------------------------------
-} */
  
- function ASC()
+function ASC()
 {
 	
 	$con=mysqli_connect("localhost","root","root","expired_date");
